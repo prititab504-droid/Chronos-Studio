@@ -4,7 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>OmniAI Studio</title>
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Marked.js for Markdown rendering -->
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
@@ -32,9 +34,9 @@
         </div>
         <div class="flex items-center space-x-3">
             <select id="modelSelect" class="bg-slate-900 border border-slate-700 text-xs rounded-lg px-3 py-2 text-slate-300 focus:outline-none focus:border-indigo-500">
-                <option value="openrouter/free">OpenRouter Free Auto-Router (Recommended)</option>
-                <option value="google/gemini-2.5-flash">Gemini 2.5 Flash</option>
-                <option value="deepseek/deepseek-chat">DeepSeek V3</option>
+                <option value="openrouter/free">OpenRouter Free Auto-Router (Best)</option>
+                <option value="deepseek/deepseek-r1:free">DeepSeek R1 Free</option>
+                <option value="google/gemma-2-9b-it:free">Google Gemma 2 Free</option>
             </select>
             <button onclick="clearChat()" class="text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-2 rounded-lg transition border border-slate-700">Clear</button>
         </div>
@@ -46,7 +48,7 @@
             <div class="h-9 w-9 rounded-full bg-gradient-to-tr from-indigo-600 to-violet-500 flex-shrink-0 flex items-center justify-center font-bold text-xs shadow-md">AI</div>
             <div class="glass border border-slate-800 rounded-2xl p-4 max-w-[85%] sm:max-w-xl text-sm leading-relaxed shadow-lg">
                 <p class="font-semibold text-indigo-400 mb-1">Welcome! 👋</p>
-                <p>System is online. Type any message in <strong>any language</strong>!</p>
+                <p>System is online. Type any message in <strong>any language</strong> (English, Hindi, Spanish, French, Chinese, Arabic, etc.)!</p>
             </div>
         </div>
     </main>
@@ -64,7 +66,7 @@
     </footer>
 
     <script>
-        const API_KEY = "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";
+        const API_KEY = "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";
         const API_URL = "https://openrouter.ai/api/v1/chat/completions";
         
         let conversationHistory = [
@@ -153,22 +155,26 @@
 
                 const data = await response.json();
                 
-                // Safely inspect response structure
-                if (data.choices && data.choices[0] && data.choices[0].message) {
-                    const reply = data.choices[0].message.content;
+                let reply = "";
+                if (data.choices && data.choices[0]) {
+                    if (data.choices[0].message && data.choices[0].message.content) {
+                        reply = data.choices[0].message.content;
+                    } else if (data.choices[0].delta && data.choices[0].delta.content) {
+                        reply = data.choices[0].delta.content;
+                    }
+                }
+
+                if (reply) {
                     conversationHistory.push({ role: "assistant", content: reply });
                     document.getElementById(aiBubbleId).innerHTML = marked.parse(reply);
                 } else if (data.error) {
-                    // Display explicit error message from OpenRouter API
-                    document.getElementById(aiBubbleId).innerHTML = `<span class="text-red-400">OpenRouter API Error: ${escapeHtml(data.error.message || JSON.stringify(data.error))}</span>`;
+                    document.getElementById(aiBubbleId).innerHTML = `<span class="text-red-400">API Error: ${escapeHtml(data.error.message || JSON.stringify(data.error))}</span>`;
                 } else {
-                    // Fallback log of raw response structure for debugging
-                    console.error("Unexpected structure:", data);
-                    document.getElementById(aiBubbleId).innerHTML = `<span class="text-red-400">Error: Received unexpected structure. Check if your API key has credits or switch to the Free Auto-Router model.</span>`;
+                    document.getElementById(aiBubbleId).innerHTML = `<span class="text-red-400">Error: Received invalid response structure from API.</span>`;
                 }
             } catch (error) {
                 console.error(error);
-                document.getElementById(aiBubbleId).innerHTML = `<span class="text-red-400">Connection Error: Request failed. Make sure you are running via a local web server (like VS Code Live Server).</span>`;
+                document.getElementById(aiBubbleId).innerHTML = `<span class="text-red-400">Connection Error: Request failed. Ensure you open this file via a local web server if required by your browser.</span>`;
             } finally {
                 sendBtn.disabled = false;
                 chatContainer.scrollTop = chatContainer.scrollHeight;
