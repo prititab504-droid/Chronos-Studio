@@ -3,78 +3,73 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Universal AI Assistant - OpenRouter</title>
-    <!-- Tailwind CSS for modern styling -->
+    <title>OmniAI Studio</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Marked.js for rendering markdown formatting in AI responses -->
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
         body { font-family: 'Inter', sans-serif; }
-        .glass { background: rgba(17, 24, 39, 0.75); backdrop-filter: blur(16px); }
+        .glass { background: rgba(15, 23, 42, 0.85); backdrop-filter: blur(12px); }
         .chat-container::-webkit-scrollbar { width: 6px; }
-        .chat-container::-webkit-scrollbar-thumb { background: rgba(156, 163, 175, 0.3); border-radius: 4px; }
-        .message-content pre { background: #1e293b; padding: 1rem; border-radius: 0.5rem; overflow-x: auto; margin-top: 0.5rem; }
-        .message-content code { font-family: monospace; background: rgba(0,0,0,0.2); padding: 0.2rem 0.4rem; border-radius: 0.25rem; }
+        .chat-container::-webkit-scrollbar-thumb { background: rgba(148, 163, 184, 0.2); border-radius: 4px; }
+        .message-content pre { background: #0f172a; padding: 1rem; border-radius: 0.5rem; overflow-x: auto; margin-top: 0.5rem; }
+        .message-content code { font-family: monospace; background: rgba(0,0,0,0.3); padding: 0.2rem 0.4rem; border-radius: 0.25rem; }
         .message-content pre code { background: transparent; padding: 0; }
     </style>
 </head>
 <body class="bg-slate-950 text-slate-100 h-screen flex flex-col justify-between overflow-hidden">
 
-    <!-- Top Navigation Header -->
+    <!-- Header -->
     <header class="glass border-b border-slate-800 p-4 flex justify-between items-center z-10">
         <div class="flex items-center space-x-3">
-            <div class="h-10 w-10 rounded-xl bg-gradient-to-tr from-violet-600 to-indigo-500 flex items-center justify-center shadow-lg shadow-indigo-500/30">
-                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round5" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+            <div class="h-10 w-10 rounded-xl bg-gradient-to-tr from-indigo-600 to-violet-500 flex items-center justify-center shadow-lg shadow-indigo-500/30 font-bold text-lg">
+                🤖
             </div>
             <div>
-                <h1 class="font-bold text-lg tracking-tight bg-gradient-to-r from-white to-slate-400 bg-clip-text text-transparent">OmniAI Studio</h1>
-                <p class="text-xs text-slate-400">Powered by OpenRouter • Multilingual & Universal</p>
+                <h1 class="font-bold text-lg tracking-tight text-white">OmniAI Studio</h1>
+                <p class="text-xs text-slate-400">Multilingual & Universal AI Chat</p>
             </div>
         </div>
         <div class="flex items-center space-x-3">
             <select id="modelSelect" class="bg-slate-900 border border-slate-700 text-xs rounded-lg px-3 py-2 text-slate-300 focus:outline-none focus:border-indigo-500">
-                <option value="google/gemini-2.5-flash">Gemini 2.5 Flash (Fast & Smart)</option>
-                <option value="anthropic/claude-3.5-sonnet">Claude 3.5 Sonnet</option>
-                <option value="openai/gpt-4o">GPT-4o</option>
-                <option value="deepseek/deepseek-chat">DeepSeek V3</option>
+                <option value="openrouter/free">OpenRouter Auto Free Models</option>
+                <option value="google/gemma-2-9b-it:free">Google Gemma 2 (Free)</option>
+                <option value="meta-llama/llama-3.2-3b-instruct:free">Meta Llama 3.2 (Free)</option>
+                <option value="deepseek/deepseek-r1:free">DeepSeek R1 (Free)</option>
             </select>
-            <button onclick="clearChat()" class="text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-2 rounded-lg transition border border-slate-700">Clear Chat</button>
+            <button onclick="clearChat()" class="text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-2 rounded-lg transition border border-slate-700">Clear</button>
         </div>
     </header>
 
     <!-- Chat Messages Container -->
     <main id="chatContainer" class="chat-container flex-1 overflow-y-auto p-4 sm:p-6 space-y-6 max-w-4xl w-full mx-auto">
-        <!-- Welcome Message -->
         <div class="flex items-start space-x-4">
-            <div class="h-9 w-9 rounded-full bg-gradient-to-tr from-violet-600 to-indigo-500 flex-shrink-0 flex items-center justify-center font-bold text-sm shadow-md">AI</div>
+            <div class="h-9 w-9 rounded-full bg-gradient-to-tr from-indigo-600 to-violet-500 flex-shrink-0 flex items-center justify-center font-bold text-xs shadow-md">AI</div>
             <div class="glass border border-slate-800 rounded-2xl p-4 max-w-[85%] sm:max-w-xl text-sm leading-relaxed shadow-lg">
-                <p class="font-semibold text-indigo-400 mb-1">Hello! 👋</p>
-                <p>I am your universal AI assistant. I can understand and write code, translate languages, solve logic puzzles, and chat in <strong>any language</strong> you prefer (English, Spanish, Hindi, Japanese, French, Arabic, etc.). How can I help you today?</p>
+                <p class="font-semibold text-indigo-400 mb-1">Welcome! 👋</p>
+                <p>I am connected to your OpenRouter API. Type any message in <strong>English, Spanish, Hindi, French, Arabic, Chinese</strong>, or any other language!</p>
             </div>
         </div>
     </main>
 
-    <!-- Input Footer Bar -->
+    <!-- Input Bar -->
     <footer class="glass border-t border-slate-800 p-4 z-10">
         <div class="max-w-4xl mx-auto flex items-center space-x-3">
-            <textarea id="userInput" rows="1" placeholder="Type your message in any language..." 
+            <textarea id="userInput" rows="1" placeholder="Type message in any language..." 
                 class="flex-1 bg-slate-900 border border-slate-800 rounded-xl px-4 py-3 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-indigo-500 resize-none max-h-32"
                 onkeydown="handleKeyPress(event)" oninput="autoResize(this)"></textarea>
             <button onclick="sendMessage()" id="sendBtn" class="bg-indigo-600 hover:bg-indigo-500 text-white p-3 rounded-xl transition flex items-center justify-center shadow-lg shadow-indigo-600/30 flex-shrink-0">
                 <svg class="w-5 h-5 transform rotate-90" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/></svg>
             </button>
         </div>
-        <p class="text-[10px] text-center text-slate-500 mt-2">OpenRouter API connected securely. Fully responsive UI.</p>
     </footer>
 
-    <!-- Script Logic -->
     <script>
         const API_KEY = "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";
         const API_URL = "https://openrouter.ai/api/v1/chat/completions";
         
         let conversationHistory = [
-            { role: "system", content: "You are a helpful, smart, and friendly AI assistant. Answer accurately in whatever language the user speaks." }
+            { role: "system", content: "You are a helpful, smart assistant. Answer accurately in the user's language." }
         ];
 
         function autoResize(textarea) {
@@ -93,10 +88,10 @@
             conversationHistory = [conversationHistory[0]];
             document.getElementById('chatContainer').innerHTML = `
                 <div class="flex items-start space-x-4">
-                    <div class="h-9 w-9 rounded-full bg-gradient-to-tr from-violet-600 to-indigo-500 flex-shrink-0 flex items-center justify-center font-bold text-sm shadow-md">AI</div>
+                    <div class="h-9 w-9 rounded-full bg-gradient-to-tr from-indigo-600 to-violet-500 flex-shrink-0 flex items-center justify-center font-bold text-xs shadow-md">AI</div>
                     <div class="glass border border-slate-800 rounded-2xl p-4 max-w-[85%] sm:max-w-xl text-sm leading-relaxed shadow-lg">
                         <p class="font-semibold text-indigo-400 mb-1">Chat cleared! ✨</p>
-                        <p>How can I assist you now?</p>
+                        <p>Ready for your next question.</p>
                     </div>
                 </div>`;
         }
@@ -110,31 +105,29 @@
             const text = inputField.value.trim();
             if (!text) return;
 
-            // Clear input field
             inputField.value = '';
             inputField.style.height = 'auto';
 
-            // Append User Message to UI
+            // Append User Message
             const userBubble = document.createElement('div');
             userBubble.className = "flex items-start justify-end space-x-4";
             userBubble.innerHTML = `
                 <div class="bg-indigo-600 text-white rounded-2xl p-4 max-w-[85%] sm:max-w-xl text-sm leading-relaxed shadow-lg message-content">
                     ${escapeHtml(text)}
                 </div>
-                <div class="h-9 w-9 rounded-full bg-slate-700 flex-shrink-0 flex items-center justify-center font-bold text-sm shadow-md">You</div>
+                <div class="h-9 w-9 rounded-full bg-slate-700 flex-shrink-0 flex items-center justify-center font-bold text-xs shadow-md">You</div>
             `;
             chatContainer.appendChild(userBubble);
             chatContainer.scrollTop = chatContainer.scrollHeight;
 
-            // Push to history
             conversationHistory.push({ role: "user", content: text });
 
-            // Create Loading AI Bubble
+            // AI Loading State
             const aiBubbleId = 'ai-msg-' + Date.now();
             const aiBubble = document.createElement('div');
             aiBubble.className = "flex items-start space-x-4";
             aiBubble.innerHTML = `
-                <div class="h-9 w-9 rounded-full bg-gradient-to-tr from-violet-600 to-indigo-500 flex-shrink-0 flex items-center justify-center font-bold text-sm shadow-md">AI</div>
+                <div class="h-9 w-9 rounded-full bg-gradient-to-tr from-indigo-600 to-violet-500 flex-shrink-0 flex items-center justify-center font-bold text-xs shadow-md">AI</div>
                 <div id="${aiBubbleId}" class="glass border border-slate-800 rounded-2xl p-4 max-w-[85%] sm:max-w-xl text-sm leading-relaxed shadow-lg message-content text-slate-300">
                     <span class="inline-block animate-pulse">Thinking...</span>
                 </div>
@@ -149,7 +142,7 @@
                     method: 'POST',
                     headers: {
                         'Authorization': `Bearer ${API_KEY}`,
-                        'HTTP-Referer': window.location.href,
+                        'HTTP-Referer': 'http://localhost',
                         'X-Title': 'OmniAI Studio',
                         'Content-Type': 'application/json'
                     },
@@ -164,15 +157,15 @@
                 if (data.choices && data.choices.length > 0) {
                     const reply = data.choices[0].message.content;
                     conversationHistory.push({ role: "assistant", content: reply });
-                    
-                    // Render Markdown response safely
                     document.getElementById(aiBubbleId).innerHTML = marked.parse(reply);
+                } else if (data.error) {
+                    document.getElementById(aiBubbleId).innerHTML = `<span class="text-red-400">API Error: ${escapeHtml(data.error.message)}</span>`;
                 } else {
-                    document.getElementById(aiBubbleId).innerHTML = `<span class="text-red-400">Error: Received invalid response structure from API.</span>`;
+                    document.getElementById(aiBubbleId).innerHTML = `<span class="text-red-400">Error: Unexpected response format.</span>`;
                 }
             } catch (error) {
                 console.error(error);
-                document.getElementById(aiBubbleId).innerHTML = `<span class="text-red-400">Network Error: Could not connect to OpenRouter.</span>`;
+                document.getElementById(aiBubbleId).innerHTML = `<span class="text-red-400">Connection Error: OpenRouter request blocked. Run on a local web server (e.g. VS Code Live Server) to bypass browser restrictions.</span>`;
             } finally {
                 sendBtn.disabled = false;
                 chatContainer.scrollTop = chatContainer.scrollHeight;
