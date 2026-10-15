@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OmniAI Studio - Activated</title>
+    <title>OmniAI Studio</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Marked.js for Markdown rendering -->
@@ -21,6 +21,7 @@
             0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.7); }
             70% { transform: scale(1); box-shadow: 0 0 0 10px rgba(99, 102, 241, 0); }
             100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(99, 102, 241, 0); }
+        }
         .listening { animation: pulse-ring 1.5s infinite; background-color: #ef4444 !important; }
     </style>
 </head>
@@ -83,7 +84,10 @@
         
         let isActivated = false;
         let conversationHistory = [
-            { role: "system", content: "You are a helpful, smart assistant. Answer accurately in whatever language the user speaks." }
+            { 
+                role: "system", 
+                content: "Your name is Omni. You were created by Vedant. Always answer accurately in whatever language the user speaks. If anyone asks 'Who created you?', reply exactly 'I am created by Vedant.'. If anyone asks 'Who are you?', reply exactly 'I am Omni'." 
+            }
         ];
 
         function autoResize(textarea) {
@@ -100,7 +104,7 @@
 
         function clearChat() {
             isActivated = false;
-            document.getElementById('statusBadgeclassName').className = "text-[10px] px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-400 border border-amber-500/30";
+            document.getElementById('statusBadge').className = "text-[10px] px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-400 border border-amber-500/30";
             document.getElementById('statusBadge').innerText = "Locked";
             document.getElementById('userInput').placeholder = "Type 'Hello Omni' to activate...";
             
@@ -125,7 +129,7 @@
 
             const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
             recognition = new SpeechRecognition();
-            recognition.lang = 'en-US'; // Adjusts dynamically or defaults to universal recognition
+            recognition.lang = 'en-US';
             recognition.interimResults = false;
 
             const micBtn = document.getElementById('micBtn');
@@ -150,11 +154,11 @@
             recognition.start();
         }
 
-        // Text-to-Speech function for AI responses
+        // Text-to-Speech function
         function speakText(text) {
             if ('speechSynthesis' in window) {
-                window.speechSynthesis.cancel(); // Stop any ongoing speech
-                const cleanText = text.replace(/[*#_`]/g, ''); // Strip markdown symbols for natural reading
+                window.speechSynthesis.cancel();
+                const cleanText = text.replace(/[*#_`]/g, '');
                 const utterance = new SpeechSynthesisUtterance(cleanText);
                 utterance.rate = 1.0;
                 window.speechSynthesis.speak(utterance);
@@ -173,7 +177,7 @@
             inputField.value = '';
             inputField.style.height = 'auto';
 
-            // Check activation condition if not yet unlocked
+            // Check activation condition if not unlocked
             if (!isActivated) {
                 if (text.toLowerCase().includes("hello omni")) {
                     isActivated = true;
@@ -181,7 +185,6 @@
                     document.getElementById('statusBadge').innerText = "Active ✨";
                     document.getElementById('userInput').placeholder = "Type message in any language...";
 
-                    // Show activation success bubble
                     const userBubble = document.createElement('div');
                     userBubble.className = "flex items-start justify-end space-x-4";
                     userBubble.innerHTML = `<div class="bg-indigo-600 text-white rounded-2xl p-4 max-w-[85%] sm:max-w-xl text-sm leading-relaxed shadow-lg">${escapeHtml(text)}</div><div class="h-9 w-9 rounded-full bg-slate-700 flex-shrink-0 flex items-center justify-center font-bold text-sm shadow-md">You</div>`;
@@ -195,7 +198,6 @@
                     speakText("Activation successful. OmniAI Studio is now online.");
                     return;
                 } else {
-                    // Rejected prompt until "Hello Omni" is stated
                     const userBubble = document.createElement('div');
                     userBubble.className = "flex items-start justify-end space-x-4";
                     userBubble.innerHTML = `<div class="bg-indigo-600 text-white rounded-2xl p-4 max-w-[85%] sm:max-w-xl text-sm leading-relaxed shadow-lg">${escapeHtml(text)}</div><div class="h-9 w-9 rounded-full bg-slate-700 flex-shrink-0 flex items-center justify-center font-bold text-sm shadow-md">You</div>`;
@@ -210,7 +212,7 @@
                 }
             }
 
-            // Normal chat flow once activated
+            // Append User Message
             const userBubble = document.createElement('div');
             userBubble.className = "flex items-start justify-end space-x-4";
             userBubble.innerHTML = `
@@ -222,6 +224,27 @@
             chatContainer.appendChild(userBubble);
             chatContainer.scrollTop = chatContainer.scrollHeight;
 
+            // Direct rule checks for custom answers
+            const lowerInput = text.toLowerCase().trim().replace(/[?!.,]/g, '');
+            if (lowerInput === "who created you" || lowerInput === "who made you") {
+                const customReply = "I am created by Vedant.";
+                appendAiResponse(chatContainer, customReply);
+                conversationHistory.push({ role: "user", content: text });
+                conversationHistory.push({ role: "assistant", content: customReply });
+                speakText(customReply);
+                return;
+            }
+
+            if (lowerInput === "who are you" || lowerInput === "what is your name") {
+                const customReply = "I am Omni";
+                appendAiResponse(chatContainer, customReply);
+                conversationHistory.push({ role: "user", content: text });
+                conversationHistory.push({ role: "assistant", content: customReply });
+                speakText(customReply);
+                return;
+            }
+
+            // Normal API flow
             conversationHistory.push({ role: "user", content: text });
 
             const aiBubbleId = 'ai-msg-' + Date.now();
@@ -267,7 +290,7 @@
                 if (reply) {
                     conversationHistory.push({ role: "assistant", content: reply });
                     document.getElementById(aiBubbleId).innerHTML = marked.parse(reply);
-                    speakText(reply); // Automatically reads response aloud
+                    speakText(reply);
                 } else if (data.error) {
                     document.getElementById(aiBubbleId).innerHTML = `<span class="text-red-400">API Error: ${escapeHtml(data.error.message || JSON.stringify(data.error))}</span>`;
                 } else {
@@ -280,6 +303,19 @@
                 sendBtn.disabled = false;
                 chatContainer.scrollTop = chatContainer.scrollHeight;
             }
+        }
+
+        function appendAiResponse(container, text) {
+            const aiBubble = document.createElement('div');
+            aiBubble.className = "flex items-start space-x-4";
+            aiBubble.innerHTML = `
+                <div class="h-9 w-9 rounded-full bg-gradient-to-tr from-indigo-600 to-violet-500 flex-shrink-0 flex items-center justify-center font-bold text-sm shadow-md">AI</div>
+                <div class="glass border border-slate-800 rounded-2xl p-4 max-w-[85%] sm:max-w-xl text-sm leading-relaxed shadow-lg message-content text-slate-100">
+                    ${escapeHtml(text)}
+                </div>
+            `;
+            container.appendChild(aiBubble);
+            container.scrollTop = container.scrollHeight;
         }
 
         function escapeHtml(text) {
