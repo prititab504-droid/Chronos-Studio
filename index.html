@@ -1,381 +1,187 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>OmniAI Studio - Autonomous Platform</title>
-  <style>
-    :root {
-      --bg-dark: #0f0f12;
-      --bg-panel: #18181c;
-      --bg-card: #222228;
-      --accent: #7c3aed;
-      --accent-hover: #6d28d9;
-      --text-main: #f3f4f6;
-      --text-muted: #9ca3af;
-      --border: #27272a;
-      --success: #10b981;
-      --danger: #ef4444;
-    }
-
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-    body { background: var(--bg-dark); color: var(--text-main); display: flex; height: 100vh; overflow: hidden; }
-
-    /* AUTH OVERLAY */
-    #auth-screen {
-      position: fixed; inset: 0; background: rgba(15, 15, 18, 0.95);
-      display: flex; justify-content: center; align-items: center; z-index: 1000;
-      backdrop-filter: blur(8px);
-    }
-    .auth-box {
-      background: var(--bg-panel); padding: 2.5rem; border-radius: 12px;
-      width: 100%; max-width: 380px; border: 1px solid var(--border);
-      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
-    }
-    .auth-box h2 { margin-bottom: 0.5rem; text-align: center; color: var(--accent); }
-    .auth-box p { text-align: center; color: var(--text-muted); font-size: 0.85rem; margin-bottom: 1.5rem; }
-    .auth-box input {
-      width: 100%; padding: 0.75rem; margin-bottom: 1rem; border-radius: 6px;
-      border: 1px solid var(--border); background: #000; color: #fff; outline: none;
-    }
-    .auth-box input:focus { border-color: var(--accent); }
-    .auth-box button {
-      width: 100%; padding: 0.75rem; background: var(--accent); color: #fff;
-      border: none; border-radius: 6px; cursor: pointer; font-weight: bold; transition: background 0.2s;
-    }
-    .auth-box button:hover { background: var(--accent-hover); }
-
-    /* LAYOUT STRUCTURE */
-    .sidebar {
-      width: 260px; background: var(--bg-panel); padding: 1.5rem;
-      display: flex; flex-direction: column; border-right: 1px solid var(--border);
-    }
-    .sidebar h1 { font-size: 1.25rem; color: var(--accent); margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem; }
-    .nav-item {
-      background: transparent; border: none; color: var(--text-muted);
-      padding: 0.75rem 1rem; text-align: left; border-radius: 6px;
-      cursor: pointer; margin-bottom: 0.5rem; font-size: 0.95rem; transition: all 0.2s;
-    }
-    .nav-item.active, .nav-item:hover { background: var(--bg-card); color: #fff; }
-    
-    .user-footer { margin-top: auto; padding-top: 1rem; border-top: 1px solid var(--border); }
-    .user-footer p { font-size: 0.85rem; color: var(--text-muted); }
-    .logout-btn {
-      background: var(--danger); color: white; border: none; padding: 0.5rem;
-      width: 100%; border-radius: 6px; cursor: pointer; margin-top: 0.5rem; font-weight: 500;
-    }
-
-    .content-area { flex: 1; padding: 2rem; overflow-y: auto; display: flex; flex-direction: column; }
-    .tab { display: none; flex-direction: column; height: 100%; }
-    .tab.active { display: flex; }
-
-    /* CHAT PANEL */
-    .chat-box { 
-      flex: 1; background: #000; border-radius: 8px; padding: 1rem; 
-      overflow-y: auto; margin-bottom: 1rem; border: 1px solid var(--border);
-      display: flex; flex-direction: column; gap: 0.75rem;
-    }
-    .msg { padding: 0.75rem 1rem; border-radius: 8px; max-width: 75%; font-size: 0.95rem; line-height: 1.4; }
-    .msg.user { background: var(--accent); align-self: flex-end; color: #fff; }
-    .msg.assistant { background: var(--bg-card); align-self: flex-start; border: 1px solid var(--border); }
-
-    .input-row { display: flex; gap: 0.75rem; }
-    .input-row input, .input-row textarea {
-      flex: 1; padding: 0.75rem; border-radius: 6px; border: 1px solid var(--border);
-      background: #000; color: #fff; outline: none;
-    }
-    .input-row input:focus, .input-row textarea:focus { border-color: var(--accent); }
-    .input-row button {
-      padding: 0.75rem 1.5rem; background: var(--accent); color: #fff;
-      border: none; border-radius: 6px; cursor: pointer; font-weight: 600;
-    }
-
-    /* GENERAL PANELS */
-    .panel { background: var(--bg-panel); padding: 1.5rem; border-radius: 8px; border: 1px solid var(--border); margin-bottom: 1rem; }
-    .panel h3 { margin-bottom: 0.75rem; font-size: 1.1rem; }
-    
-    .status-badge {
-      display: inline-block; padding: 0.25rem 0.5rem; border-radius: 4px;
-      font-size: 0.75rem; font-weight: bold; background: var(--accent); color: #fff; margin-top: 0.5rem;
-    }
-
-    .output-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 1rem; margin-top: 1rem; }
-    .output-card { background: var(--bg-card); border-radius: 8px; padding: 0.75rem; border: 1px solid var(--border); text-align: center; }
-    .output-card img { width: 100%; border-radius: 6px; height: 140px; object-fit: cover; }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Universal AI Assistant - OpenRouter</title>
+    <!-- Tailwind CSS for modern styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Marked.js for rendering markdown formatting in AI responses -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+        .glass { background: rgba(17, 24, 39, 0.75); backdrop-filter: blur(16px); }
+        .chat-container::-webkit-scrollbar { width: 6px; }
+        .chat-container::-webkit-scrollbar-thumb { background: rgba(156, 163, 175, 0.3); border-radius: 4px; }
+        .message-content pre { background: #1e293b; padding: 1rem; border-radius: 0.5rem; overflow-x: auto; margin-top: 0.5rem; }
+        .message-content code { font-family: monospace; background: rgba(0,0,0,0.2); padding: 0.2rem 0.4rem; border-radius: 0.25rem; }
+        .message-content pre code { background: transparent; padding: 0; }
+    </style>
 </head>
-<body>
+<body class="bg-slate-950 text-slate-100 h-screen flex flex-col justify-between overflow-hidden">
 
-  <!-- AUTH OVERLAY -->
-  <div id="auth-screen">
-    <div class="auth-box">
-      <h2>OmniAI Access</h2>
-      <p>Sign in or enter a username to start a persistent session.</p>
-      <input type="text" id="username" placeholder="Username">
-      <input type="password" id="password" placeholder="Password">
-      <button onclick="handleLogin()">Sign In / Initialize Session</button>
-    </div>
-  </div>
-
-  <!-- SIDEBAR NAVIGATION -->
-  <div class="sidebar">
-    <h1>✨ OmniAI Studio</h1>
-    <button class="nav-item active" onclick="setTab('chat')">💬 Conversational AI</button>
-    <button class="nav-item" onclick="setTab('image')">🖼️ Image Synthesizer</button>
-    <button class="nav-item" onclick="setTab('video')">🎬 Long Video Engine</button>
-
-    <div class="user-footer">
-      <p>Logged in as: <strong id="user-display" style="color: #fff;">---</strong></p>
-      <button class="logout-btn" onclick="handleLogout()">Manual Log Out</button>
-    </div>
-  </div>
-
-  <!-- MAIN CONTENT AREA -->
-  <div class="content-area">
-    
-    <!-- CHAT TAB -->
-    <div id="tab-chat" class="tab active">
-      <h2 style="margin-bottom: 1rem;">Persistent AI Conversation</h2>
-      <div class="chat-box" id="chat-box"></div>
-      <div class="input-row">
-        <input type="text" id="chat-input" placeholder="Type a message..." onkeypress="if(event.key==='Enter') sendChat()">
-        <button onclick="sendChat()">Send</button>
-      </div>
-    </div>
-
-    <!-- IMAGE TAB -->
-    <div id="tab-image" class="tab">
-      <h2 style="margin-bottom: 1rem;">High-Resolution Image Generator</h2>
-      <div class="panel">
-        <h3>Text-to-Image Generation</h3>
-        <div class="input-row">
-          <input type="text" id="image-prompt" placeholder="A futuristic cyberpunk city illuminated by neon lights, 8k render...">
-          <button onclick="generateImage()">Synthesize Image</button>
+    <!-- Top Navigation Header -->
+    <header class="glass border-b border-slate-800 p-4 flex justify-between items-center z-10">
+        <div class="flex items-center space-x-3">
+            <div class="h-10 w-10 rounded-xl bg-gradient-to-tr from-violet-600 to-indigo-500 flex items-center justify-center shadow-lg shadow-indigo-500/30">
+                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round5" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+            </div>
+            <div>
+                <h1 class="font-bold text-lg tracking-tight bg-gradient-to-r from-white to-slate-400 bg-clip-text text-transparent">OmniAI Studio</h1>
+                <p class="text-xs text-slate-400">Powered by OpenRouter • Multilingual & Universal</p>
+            </div>
         </div>
-      </div>
-      <div id="image-output" class="output-grid"></div>
-    </div>
-
-    <!-- VIDEO TAB -->
-    <div id="tab-video" class="tab">
-      <h2 style="margin-bottom: 1rem;">Multi-Hour Video Processing Pipeline</h2>
-      <div class="panel">
-        <h3>Queue Production Request (1 to 3 Hours)</h3>
-        <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 1rem;">
-          Multi-hour generation processes 10-second high-definition clip chunks sequentially through an orchestration queue.
-        </p>
-        <textarea id="video-prompt" style="width: 100%; height: 80px; margin-bottom: 0.75rem;" placeholder="Detailed storyline, style directives, audio cue descriptions..."></textarea>
-        <div class="input-row">
-          <input type="number" id="video-hours" min="1" max="3" value="2" style="max-width: 100px;">
-          <span style="align-self: center; color: var(--text-muted);">Hour(s)</span>
-          <button onclick="submitVideoJob()">Initialize Video Job</button>
+        <div class="flex items-center space-x-3">
+            <select id="modelSelect" class="bg-slate-900 border border-slate-700 text-xs rounded-lg px-3 py-2 text-slate-300 focus:outline-none focus:border-indigo-500">
+                <option value="google/gemini-2.5-flash">Gemini 2.5 Flash (Fast & Smart)</option>
+                <option value="anthropic/claude-3.5-sonnet">Claude 3.5 Sonnet</option>
+                <option value="openai/gpt-4o">GPT-4o</option>
+                <option value="deepseek/deepseek-chat">DeepSeek V3</option>
+            </select>
+            <button onclick="clearChat()" class="text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-2 rounded-lg transition border border-slate-700">Clear Chat</button>
         </div>
-      </div>
-      <div id="video-job-status"></div>
-    </div>
+    </header>
 
-  </div>
+    <!-- Chat Messages Container -->
+    <main id="chatContainer" class="chat-container flex-1 overflow-y-auto p-4 sm:p-6 space-y-6 max-w-4xl w-full mx-auto">
+        <!-- Welcome Message -->
+        <div class="flex items-start space-x-4">
+            <div class="h-9 w-9 rounded-full bg-gradient-to-tr from-violet-600 to-indigo-500 flex-shrink-0 flex items-center justify-center font-bold text-sm shadow-md">AI</div>
+            <div class="glass border border-slate-800 rounded-2xl p-4 max-w-[85%] sm:max-w-xl text-sm leading-relaxed shadow-lg">
+                <p class="font-semibold text-indigo-400 mb-1">Hello! 👋</p>
+                <p>I am your universal AI assistant. I can understand and write code, translate languages, solve logic puzzles, and chat in <strong>any language</strong> you prefer (English, Spanish, Hindi, Japanese, French, Arabic, etc.). How can I help you today?</p>
+            </div>
+        </div>
+    </main>
 
-  <script>
-    /* ==========================================================================
-       1. IN-MEMORY BACKEND SIMULATOR (Persistent Storage Engine via localStorage)
-       ========================================================================== */
-    const MockBackend = {
-      getDB() {
-        const data = localStorage.getItem('omni_database');
-        return data ? JSON.parse(data) : { users: {}, sessions: {} };
-      },
+    <!-- Input Footer Bar -->
+    <footer class="glass border-t border-slate-800 p-4 z-10">
+        <div class="max-w-4xl mx-auto flex items-center space-x-3">
+            <textarea id="userInput" rows="1" placeholder="Type your message in any language..." 
+                class="flex-1 bg-slate-900 border border-slate-800 rounded-xl px-4 py-3 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-indigo-500 resize-none max-h-32"
+                onkeydown="handleKeyPress(event)" oninput="autoResize(this)"></textarea>
+            <button onclick="sendMessage()" id="sendBtn" class="bg-indigo-600 hover:bg-indigo-500 text-white p-3 rounded-xl transition flex items-center justify-center shadow-lg shadow-indigo-600/30 flex-shrink-0">
+                <svg class="w-5 h-5 transform rotate-90" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/></svg>
+            </button>
+        </div>
+        <p class="text-[10px] text-center text-slate-500 mt-2">OpenRouter API connected securely. Fully responsive UI.</p>
+    </footer>
 
-      saveDB(db) {
-        localStorage.setItem('omni_database', JSON.stringify(db));
-      },
+    <!-- Script Logic -->
+    <script>
+        const API_KEY = "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";
+        const API_URL = "https://openrouter.ai/api/v1/chat/completions";
+        
+        let conversationHistory = [
+            { role: "system", content: "You are a helpful, smart, and friendly AI assistant. Answer accurately in whatever language the user speaks." }
+        ];
 
-      login(username, password) {
-        const db = this.getDB();
-        if (!db.users[username]) {
-          // Register user automatically on first sign-in
-          db.users[username] = { password, chatHistory: [], jobs: [] };
-        } else if (db.users[username].password !== password) {
-          return { error: "Invalid password for existing user." };
+        function autoResize(textarea) {
+            textarea.style.height = 'auto';
+            textarea.style.height = textarea.scrollHeight + 'px';
         }
 
-        const token = "session_token_" + Math.random().toString(36).substring(2);
-        db.sessions[token] = username;
-        this.saveDB(db);
-        return { success: true, token, username, chatHistory: db.users[username].chatHistory };
-      },
-
-      verifySession(token) {
-        const db = this.getDB();
-        const username = db.sessions[token];
-        if (username && db.users[username]) {
-          return { valid: true, username, chatHistory: db.users[username].chatHistory };
+        function handleKeyPress(event) {
+            if (event.key === 'Enter' && !event.shiftKey) {
+                event.preventDefault();
+                sendMessage();
+            }
         }
-        return { valid: false };
-      },
 
-      logout(token) {
-        const db = this.getDB();
-        delete db.sessions[token];
-        this.saveDB(db);
-      },
-
-      addChatMessage(token, userMsg) {
-        const db = this.getDB();
-        const username = db.sessions[token];
-        if (!username) return null;
-
-        const userObj = { role: 'user', content: userMsg, time: new Date() };
-        const aiObj = { role: 'assistant', content: `[OmniAI Engine]: Received prompt: "${userMsg}". Connect your external AI model API here for live responses!`, time: new Date() };
-
-        db.users[username].chatHistory.push(userObj, aiObj);
-        this.saveDB(db);
-        return aiObj.content;
-      },
-
-      createVideoJob(token, prompt, hours) {
-        const db = this.getDB();
-        const username = db.sessions[token];
-        if (!username) return null;
-
-        const jobId = 'JOB-' + Math.floor(100000 + Math.random() * 900000);
-        const totalClips = Math.ceil((hours * 3600) / 10);
-
-        const job = { jobId, prompt, hours, totalClips, status: 'Processing Queue', createdAt: new Date() };
-        db.users[username].jobs.push(job);
-        this.saveDB(db);
-        return job;
-      }
-    };
-
-    /* ==========================================================================
-       2. FRONTEND CLIENT APPLICATION
-       ========================================================================== */
-    let sessionToken = localStorage.getItem('omni_app_token');
-
-    // Auto-login on load if token exists
-    window.onload = () => {
-      if (sessionToken) {
-        const res = MockBackend.verifySession(sessionToken);
-        if (res.valid) {
-          initApp(res.username, res.chatHistory);
-        } else {
-          handleLogout();
+        function clearChat() {
+            conversationHistory = [conversationHistory[0]];
+            document.getElementById('chatContainer').innerHTML = `
+                <div class="flex items-start space-x-4">
+                    <div class="h-9 w-9 rounded-full bg-gradient-to-tr from-violet-600 to-indigo-500 flex-shrink-0 flex items-center justify-center font-bold text-sm shadow-md">AI</div>
+                    <div class="glass border border-slate-800 rounded-2xl p-4 max-w-[85%] sm:max-w-xl text-sm leading-relaxed shadow-lg">
+                        <p class="font-semibold text-indigo-400 mb-1">Chat cleared! ✨</p>
+                        <p>How can I assist you now?</p>
+                    </div>
+                </div>`;
         }
-      }
-    };
 
-    function handleLogin() {
-      const u = document.getElementById('username').value.trim();
-      const p = document.getElementById('password').value.trim();
-      if (!u || !p) return alert('Please enter both username and password.');
+        async function sendMessage() {
+            const inputField = document.getElementById('userInput');
+            const sendBtn = document.getElementById('sendBtn');
+            const chatContainer = document.getElementById('chatContainer');
+            const modelSelect = document.getElementById('modelSelect').value;
+            
+            const text = inputField.value.trim();
+            if (!text) return;
 
-      const res = MockBackend.login(u, p);
-      if (res.error) {
-        alert(res.error);
-      } else {
-        sessionToken = res.token;
-        // Save session permanently until explicit manual logout
-        localStorage.setItem('omni_app_token', sessionToken);
-        initApp(res.username, res.chatHistory);
-      }
-    }
+            // Clear input field
+            inputField.value = '';
+            inputField.style.height = 'auto';
 
-    function handleLogout() {
-      if (sessionToken) {
-        MockBackend.logout(sessionToken);
-      }
-      localStorage.removeItem('omni_app_token');
-      location.reload();
-    }
+            // Append User Message to UI
+            const userBubble = document.createElement('div');
+            userBubble.className = "flex items-start justify-end space-x-4";
+            userBubble.innerHTML = `
+                <div class="bg-indigo-600 text-white rounded-2xl p-4 max-w-[85%] sm:max-w-xl text-sm leading-relaxed shadow-lg message-content">
+                    ${escapeHtml(text)}
+                </div>
+                <div class="h-9 w-9 rounded-full bg-slate-700 flex-shrink-0 flex items-center justify-center font-bold text-sm shadow-md">You</div>
+            `;
+            chatContainer.appendChild(userBubble);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
 
-    function initApp(username, history) {
-      document.getElementById('auth-screen').style.display = 'none';
-      document.getElementById('user-display').innerText = username;
-      renderChatHistory(history);
-    }
+            // Push to history
+            conversationHistory.push({ role: "user", content: text });
 
-    /* TAB SYSTEM */
-    function setTab(name) {
-      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-      document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
-      document.getElementById(`tab-${name}`).classList.add('active');
-      event.target.classList.add('active');
-    }
+            // Create Loading AI Bubble
+            const aiBubbleId = 'ai-msg-' + Date.now();
+            const aiBubble = document.createElement('div');
+            aiBubble.className = "flex items-start space-x-4";
+            aiBubble.innerHTML = `
+                <div class="h-9 w-9 rounded-full bg-gradient-to-tr from-violet-600 to-indigo-500 flex-shrink-0 flex items-center justify-center font-bold text-sm shadow-md">AI</div>
+                <div id="${aiBubbleId}" class="glass border border-slate-800 rounded-2xl p-4 max-w-[85%] sm:max-w-xl text-sm leading-relaxed shadow-lg message-content text-slate-300">
+                    <span class="inline-block animate-pulse">Thinking...</span>
+                </div>
+            `;
+            chatContainer.appendChild(aiBubble);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
 
-    /* CHAT PIPELINE */
-    function sendChat() {
-      const input = document.getElementById('chat-input');
-      const text = input.value.trim();
-      if (!text) return;
+            sendBtn.disabled = true;
 
-      appendChat('user', text);
-      input.value = '';
+            try {
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${API_KEY}`,
+                        'HTTP-Referer': window.location.href,
+                        'X-Title': 'OmniAI Studio',
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        model: modelSelect,
+                        messages: conversationHistory
+                    })
+                });
 
-      setTimeout(() => {
-        const reply = MockBackend.addChatMessage(sessionToken, text);
-        if (reply) appendChat('assistant', reply);
-      }, 400);
-    }
+                const data = await response.json();
+                
+                if (data.choices && data.choices.length > 0) {
+                    const reply = data.choices[0].message.content;
+                    conversationHistory.push({ role: "assistant", content: reply });
+                    
+                    // Render Markdown response safely
+                    document.getElementById(aiBubbleId).innerHTML = marked.parse(reply);
+                } else {
+                    document.getElementById(aiBubbleId).innerHTML = `<span class="text-red-400">Error: Received invalid response structure from API.</span>`;
+                }
+            } catch (error) {
+                console.error(error);
+                document.getElementById(aiBubbleId).innerHTML = `<span class="text-red-400">Network Error: Could not connect to OpenRouter.</span>`;
+            } finally {
+                sendBtn.disabled = false;
+                chatContainer.scrollTop = chatContainer.scrollHeight;
+            }
+        }
 
-    function appendChat(role, content) {
-      const box = document.getElementById('chat-box');
-      const msg = document.createElement('div');
-      msg.className = `msg ${role}`;
-      msg.innerText = content;
-      box.appendChild(msg);
-      box.scrollTop = box.scrollHeight;
-    }
-
-    function renderChatHistory(history) {
-      const box = document.getElementById('chat-box');
-      box.innerHTML = '';
-      if (history && history.length > 0) {
-        history.forEach(m => appendChat(m.role, m.content));
-      } else {
-        appendChat('assistant', 'Hello! I am OmniAI. How can I assist you today?');
-      }
-    }
-
-    /* IMAGE GENERATION */
-    function generateImage() {
-      const prompt = document.getElementById('image-prompt').value.trim();
-      if (!prompt) return alert('Please enter an image prompt.');
-
-      const grid = document.getElementById('image-output');
-      const card = document.createElement('div');
-      card.className = 'output-card';
-      card.innerHTML = `
-        <img src="https://picsum.photos/seed/${Math.random()}/300/200" alt="Generated Image">
-        <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.5rem; text-overflow: ellipsis; overflow: hidden; white-space: nowrap;">${prompt}</p>
-      `;
-      grid.prepend(card);
-    }
-
-    /* VIDEO JOB QUEUEING */
-    function submitVideoJob() {
-      const prompt = document.getElementById('video-prompt').value.trim();
-      const hours = parseInt(document.getElementById('video-hours').value);
-      if (!prompt) return alert('Please enter a video prompt.');
-
-      const job = MockBackend.createVideoJob(sessionToken, prompt, hours);
-      if (!job) return alert('Session error. Please log in again.');
-
-      const statusBox = document.getElementById('video-job-status');
-      statusBox.innerHTML = `
-        <div class="panel">
-          <div style="display: flex; justify-content: space-between; align-items: center;">
-            <h3>Job ID: ${job.jobId}</h3>
-            <span class="status-badge">${job.status}</span>
-          </div>
-          <p style="margin-top: 0.5rem;">Target Duration: <strong>${job.hours} Hour(s)</strong></p>
-          <p>Total Clips to Render & Stitch: <strong>${job.totalClips.toLocaleString()} (10-sec chunks)</strong></p>
-          <div style="background: #000; height: 8px; border-radius: 4px; margin-top: 1rem; overflow: hidden;">
-            <div style="background: var(--accent); width: 5%; height: 100%;"></div>
-          </div>
-        </div>
-      `;
-    }
-  </script>
+        function escapeHtml(text) {
+            return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+        }
+    </script>
 </body>
 </html>
