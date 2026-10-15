@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OmniAI Studio</title>
+    <title>OmniAI Studio - Activated</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Marked.js for Markdown rendering -->
@@ -17,6 +17,11 @@
         .message-content pre { background: #0f172a; padding: 1rem; border-radius: 0.5rem; overflow-x: auto; margin-top: 0.5rem; }
         .message-content code { font-family: monospace; background: rgba(0,0,0,0.3); padding: 0.2rem 0.4rem; border-radius: 0.25rem; }
         .message-content pre code { background: transparent; padding: 0; }
+        @keyframes pulse-ring {
+            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.7); }
+            70% { transform: scale(1); box-shadow: 0 0 0 10px rgba(99, 102, 241, 0); }
+            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(99, 102, 241, 0); }
+        .listening { animation: pulse-ring 1.5s infinite; background-color: #ef4444 !important; }
     </style>
 </head>
 <body class="bg-slate-950 text-slate-100 h-screen flex flex-col justify-between overflow-hidden">
@@ -28,8 +33,11 @@
                 🤖
             </div>
             <div>
-                <h1 class="font-bold text-lg tracking-tight text-white">OmniAI Studio</h1>
-                <p class="text-xs text-slate-400">Multilingual & Universal AI Chat</p>
+                <h1 class="font-bold text-lg tracking-tight text-white flex items-center gap-2">
+                    OmniAI Studio 
+                    <span id="statusBadge" class="text-[10px] px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-400 border border-amber-500/30">Locked</span>
+                </h1>
+                <p class="text-xs text-slate-400">Say or type "Hello Omni" to unlock</p>
             </div>
         </div>
         <div class="flex items-center space-x-3">
@@ -47,8 +55,8 @@
         <div class="flex items-start space-x-4">
             <div class="h-9 w-9 rounded-full bg-gradient-to-tr from-indigo-600 to-violet-500 flex-shrink-0 flex items-center justify-center font-bold text-xs shadow-md">AI</div>
             <div class="glass border border-slate-800 rounded-2xl p-4 max-w-[85%] sm:max-w-xl text-sm leading-relaxed shadow-lg">
-                <p class="font-semibold text-indigo-400 mb-1">Welcome! 👋</p>
-                <p>System is online. Type any message in <strong>any language</strong> (English, Hindi, Spanish, French, Chinese, Arabic, etc.)!</p>
+                <p class="font-semibold text-indigo-400 mb-1">Security Check Required 🔒</p>
+                <p>Welcome to OmniAI Studio! This assistant is currently locked. To activate it and start chatting in any language, please type or speak <strong>"Hello Omni"</strong>.</p>
             </div>
         </div>
     </main>
@@ -56,7 +64,11 @@
     <!-- Input Bar -->
     <footer class="glass border-t border-slate-800 p-4 z-10">
         <div class="max-w-4xl mx-auto flex items-center space-x-3">
-            <textarea id="userInput" rows="1" placeholder="Type message in any language..." 
+            <!-- Voice Input Button -->
+            <button id="micBtn" onclick="toggleSpeechRecognition()" title="Speak to activate or chat" class="bg-slate-800 hover:bg-slate-700 text-slate-300 p-3 rounded-xl transition flex items-center justify-center border border-slate-700 flex-shrink-0">
+                <svg id="micIcon" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"/></svg>
+            </button>
+            <textarea id="userInput" rows="1" placeholder="Type 'Hello Omni' to activate..." 
                 class="flex-1 bg-slate-900 border border-slate-800 rounded-xl px-4 py-3 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-indigo-500 resize-none max-h-32"
                 onkeydown="handleKeyPress(event)" oninput="autoResize(this)"></textarea>
             <button onclick="sendMessage()" id="sendBtn" class="bg-indigo-600 hover:bg-indigo-500 text-white p-3 rounded-xl transition flex items-center justify-center shadow-lg shadow-indigo-600/30 flex-shrink-0">
@@ -69,6 +81,7 @@
         const API_KEY = "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";
         const API_URL = "https://openrouter.ai/api/v1/chat/completions";
         
+        let isActivated = false;
         let conversationHistory = [
             { role: "system", content: "You are a helpful, smart assistant. Answer accurately in whatever language the user speaks." }
         ];
@@ -86,15 +99,66 @@
         }
 
         function clearChat() {
+            isActivated = false;
+            document.getElementById('statusBadgeclassName').className = "text-[10px] px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-400 border border-amber-500/30";
+            document.getElementById('statusBadge').innerText = "Locked";
+            document.getElementById('userInput').placeholder = "Type 'Hello Omni' to activate...";
+            
             conversationHistory = [conversationHistory[0]];
             document.getElementById('chatContainer').innerHTML = `
                 <div class="flex items-start space-x-4">
                     <div class="h-9 w-9 rounded-full bg-gradient-to-tr from-indigo-600 to-violet-500 flex-shrink-0 flex items-center justify-center font-bold text-xs shadow-md">AI</div>
                     <div class="glass border border-slate-800 rounded-2xl p-4 max-w-[85%] sm:max-w-xl text-sm leading-relaxed shadow-lg">
-                        <p class="font-semibold text-indigo-400 mb-1">Chat cleared! ✨</p>
-                        <p>Ready for your next question.</p>
+                        <p class="font-semibold text-indigo-400 mb-1">Security Check Required 🔒</p>
+                        <p>Assistant locked. Type or speak <strong>"Hello Omni"</strong> to activate it again.</p>
                     </div>
                 </div>`;
+        }
+
+        // Speech-to-Text Setup
+        let recognition;
+        function toggleSpeechRecognition() {
+            if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+                alert("Speech recognition is not supported in this browser. Please use Google Chrome.");
+                return;
+            }
+
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            recognition = new SpeechRecognition();
+            recognition.lang = 'en-US'; // Adjusts dynamically or defaults to universal recognition
+            recognition.interimResults = false;
+
+            const micBtn = document.getElementById('micBtn');
+            micBtn.classList.add('listening');
+
+            recognition.onresult = function(event) {
+                const speechToText = event.results[0][0].transcript;
+                document.getElementById('userInput').value = speechToText;
+                autoResize(document.getElementById('userInput'));
+                micBtn.classList.remove('listening');
+                sendMessage();
+            };
+
+            recognition.onerror = function() {
+                micBtn.classList.remove('listening');
+            };
+
+            recognition.onend = function() {
+                micBtn.classList.remove('listening');
+            };
+
+            recognition.start();
+        }
+
+        // Text-to-Speech function for AI responses
+        function speakText(text) {
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel(); // Stop any ongoing speech
+                const cleanText = text.replace(/[*#_`]/g, ''); // Strip markdown symbols for natural reading
+                const utterance = new SpeechSynthesisUtterance(cleanText);
+                utterance.rate = 1.0;
+                window.speechSynthesis.speak(utterance);
+            }
         }
 
         async function sendMessage() {
@@ -109,7 +173,44 @@
             inputField.value = '';
             inputField.style.height = 'auto';
 
-            // Append User Message
+            // Check activation condition if not yet unlocked
+            if (!isActivated) {
+                if (text.toLowerCase().includes("hello omni")) {
+                    isActivated = true;
+                    document.getElementById('statusBadge').className = "text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30";
+                    document.getElementById('statusBadge').innerText = "Active ✨";
+                    document.getElementById('userInput').placeholder = "Type message in any language...";
+
+                    // Show activation success bubble
+                    const userBubble = document.createElement('div');
+                    userBubble.className = "flex items-start justify-end space-x-4";
+                    userBubble.innerHTML = `<div class="bg-indigo-600 text-white rounded-2xl p-4 max-w-[85%] sm:max-w-xl text-sm leading-relaxed shadow-lg">${escapeHtml(text)}</div><div class="h-9 w-9 rounded-full bg-slate-700 flex-shrink-0 flex items-center justify-center font-bold text-sm shadow-md">You</div>`;
+                    chatContainer.appendChild(userBubble);
+
+                    const aiBubble = document.createElement('div');
+                    aiBubble.className = "flex items-start space-x-4";
+                    aiBubble.innerHTML = `<div class="h-9 w-9 rounded-full bg-gradient-to-tr from-indigo-600 to-violet-500 flex-shrink-0 flex items-center justify-center font-bold text-sm shadow-md">AI</div><div class="glass border border-slate-800 rounded-2xl p-4 max-w-[85%] sm:max-w-xl text-sm leading-relaxed shadow-lg text-emerald-400"><strong>Activation successful! 🚀</strong> OmniAI Studio is now active and ready for your queries in any language.</div>`;
+                    chatContainer.appendChild(aiBubble);
+                    chatContainer.scrollTop = chatContainer.scrollHeight;
+                    speakText("Activation successful. OmniAI Studio is now online.");
+                    return;
+                } else {
+                    // Rejected prompt until "Hello Omni" is stated
+                    const userBubble = document.createElement('div');
+                    userBubble.className = "flex items-start justify-end space-x-4";
+                    userBubble.innerHTML = `<div class="bg-indigo-600 text-white rounded-2xl p-4 max-w-[85%] sm:max-w-xl text-sm leading-relaxed shadow-lg">${escapeHtml(text)}</div><div class="h-9 w-9 rounded-full bg-slate-700 flex-shrink-0 flex items-center justify-center font-bold text-sm shadow-md">You</div>`;
+                    chatContainer.appendChild(userBubble);
+
+                    const aiBubble = document.createElement('div');
+                    aiBubble.className = "flex items-start space-x-4";
+                    aiBubble.innerHTML = `<div class="h-9 w-9 rounded-full bg-gradient-to-tr from-indigo-600 to-violet-500 flex-shrink-0 flex items-center justify-center font-bold text-sm shadow-md">AI</div><div class="glass border border-slate-800 rounded-2xl p-4 max-w-[85%] sm:max-w-xl text-sm leading-relaxed shadow-lg text-amber-400">⚠️ Please type or speak <strong>"Hello Omni"</strong> to activate the AI before starting conversation.</div>`;
+                    chatContainer.appendChild(aiBubble);
+                    chatContainer.scrollTop = chatContainer.scrollHeight;
+                    return;
+                }
+            }
+
+            // Normal chat flow once activated
             const userBubble = document.createElement('div');
             userBubble.className = "flex items-start justify-end space-x-4";
             userBubble.innerHTML = `
@@ -123,12 +224,11 @@
 
             conversationHistory.push({ role: "user", content: text });
 
-            // AI Loading State
             const aiBubbleId = 'ai-msg-' + Date.now();
             const aiBubble = document.createElement('div');
             aiBubble.className = "flex items-start space-x-4";
             aiBubble.innerHTML = `
-                <div class="h-9 w-9 rounded-full bg-gradient-to-tr from-indigo-600 to-violet-500 flex-shrink-0 flex items-center justify-center font-bold text-xs shadow-md">AI</div>
+                <div class="h-9 w-9 rounded-full bg-gradient-to-tr from-indigo-600 to-violet-500 flex-shrink-0 flex items-center justify-center font-bold text-sm shadow-md">AI</div>
                 <div id="${aiBubbleId}" class="glass border border-slate-800 rounded-2xl p-4 max-w-[85%] sm:max-w-xl text-sm leading-relaxed shadow-lg message-content text-slate-300">
                     <span class="inline-block animate-pulse">Thinking...</span>
                 </div>
@@ -167,6 +267,7 @@
                 if (reply) {
                     conversationHistory.push({ role: "assistant", content: reply });
                     document.getElementById(aiBubbleId).innerHTML = marked.parse(reply);
+                    speakText(reply); // Automatically reads response aloud
                 } else if (data.error) {
                     document.getElementById(aiBubbleId).innerHTML = `<span class="text-red-400">API Error: ${escapeHtml(data.error.message || JSON.stringify(data.error))}</span>`;
                 } else {
